@@ -1,0 +1,44 @@
+---
+
+- name: startup - Installing required packages (apk)
+  apk:
+    name:
+      - rsync # needed for Ansible synchronize
+    state: present
+  tags: installation
+  when: ansible_facts['os_family'] == 'Alpine'
+  
+- name: startup - Installing required packages (apt)
+  apt:
+    name:
+      - rsync # needed for Ansible synchronize
+    state: present
+  tags: installation
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: startup - Copying startup scripts
+  synchronize:
+    src: files/opt_towalink_startup/
+    dest: /opt/towalink/startup
+    delete: yes
+    owner: no
+    perms: no
+
+- name: startup - Copying init script (Alpine)
+  copy:
+    src: files/etc_initd/towalink_startup
+    dest: /etc/init.d/towalink_startup
+    mode: 0755
+  when: ansible_facts['os_family'] == 'Alpine'
+
+- name: startup - Copying init script (Debian)
+  copy:
+    src: files/etc_systemd_system/towalink_startup.service
+    dest: /etc/systemd/system/towalink_startup.service
+    mode: 0755
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: startup - Enable startup service
+  service:
+    name: towalink_startup
+    enabled: yes

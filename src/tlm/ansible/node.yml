@@ -1,0 +1,15 @@
+---
+- name: main task
+  hosts: "{{ variable_host | default('nodes') }}"
+#  hosts: nodes
+#  connection: local
+  vars_files:
+    - vars/external_vars.yml
+#  become_user: root
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - system
+    - startup
+    - bird
+    - nodeconfig

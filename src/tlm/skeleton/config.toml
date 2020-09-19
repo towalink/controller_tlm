@@ -1,0 +1,43 @@
+# Hostname using which the nodes connect to their controller
+# Default: will be set to the hostname of this host
+#controller_hostname=
+
+# UDP port used for the management interface (WireGuard listenport)
+# Default: 51820
+#controller_wg_listenport=518220
+
+# WireGuard public key of the controller the node's connect to
+# Default: will be set to the public key belonging to the WireGuard private key of the management interface on this host
+#controller_wg_public=
+
+# IPv4 network range to be used for loopback addresses
+# Default: "192.88.99.0/24"  (block was formerly used for IPv6 to IPv4 relay and should be save to use while not colliding with RFC1918)
+#loopbacknet_ipv4="192.88.99.0/24"
+
+# IPv6 network range to be used for loopback addresses
+# It is recommended to replace this by an address range generated for or allocated to you
+# Default: "fd3e:970c:e7ec:edb5::0/64"
+#loopbacknet_ipv6="fd3e:970c:e7ec:edb5::0/64"
+
+# IPv4 transfer network range to be used for links between nodes
+# Default: loopbacknet_ipv4
+#internode_transfernet_ipv4="172.16.0.0/24"
+
+# IPv6 transfer network range to be used for links between nodes
+# Default: "fe80::0/64"
+#internode_transfernet_ipv6="fe80::0/64"
+
+# BGP autonomous system used by Node x will be (bgp_as_base + x)
+# Default: 65000
+#bgp_as_base=65000
+
+# Wireguard UDP ports that will be used
+# When Node x connects to Node y, on Node x the listen port for communicating with Node y will be (wg_listenport_base + y)
+# Default: 51820
+#wg_listenport_base=51820
+
+# SSH public keys to be installed on the Nodes
+# Default: will be set to /root/.ssh/id_rsa.pub
+node_sshauthkeys=[]
+
+#test="{wg_listenport_base}"

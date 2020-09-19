@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+
+depend() {
+    need net
+    after towalink_bootstrap
+    before bird
+}
+
+stop() {
+    wait
+}
+
+name=towalink_startup
+command="/opt/towalink/startup/towalink.sh 2>&1 > /var/log/towalink_startup.log"

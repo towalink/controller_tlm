@@ -1,0 +1,10 @@
+#!/bin/bash
+# v1.0 (2020-09-11)
+# This file is copied to /opt/towalink/stratup/scripts/
+
+echo "Creating and configuring loopback interface..."
+ip link del loopback 2>&1 > /dev/null
+ip link add loopback type dummy
+ip link set dev loopback up
+ip addr add {{loopback_ipv4}} dev loopback
+ip -6 addr add {{loopback_ipv6}} dev loopback

@@ -1,0 +1,17 @@
+[Interface]
+ListenPort = {{wg_listenport}}
+PrivateKey = {{wg_private}}
+Address = {{wg_addresses|join(', ')}}
+{%- if wg_peer_address_ipv4 is defined %}
+Postup = ip addr add {{wg_address_ipv4}} peer {{wg_peer_address_ipv4}} dev {{wg_ifname}}
+{%- endif %}
+Table = off
+
+[Peer]
+Endpoint = {{wg_peer_endpoint}}
+PublicKey = {{wg_peer_public}}
+{%- if wg_peer_preshared is defined and wg_peer_preshared|length %}
+PresharedKey = {{wg_peer_preshared}}
+{%- endif %}
+AllowedIPs = {{wg_peer_allowedips|join(', ')}}
+PersistentKeepalive = {{wg_peer_keepalive}}

@@ -1,0 +1,13 @@
+#!/bin/bash
+echo "Wireguard: Running script..."
+files=/etc/wireguard/tlwg_*
+for f in $files
+do
+  if [[ "$f" = "/etc/wireguard/tlwg_mgmt" ]]; then # "tlwg_mgmt" is managed by bootstrap script
+    continue
+  fi
+  echo "Wireguard: Processing [$f]..."
+  fbase="${f##*/}"
+  fbase="${fbase%.*}"
+  wg-quick up "$fbase"
+done

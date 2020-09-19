@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Excluded developer-local files
+/src/tlm/ansible/roles/system/files/unused_etc_sysctld

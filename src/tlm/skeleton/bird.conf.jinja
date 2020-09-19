@@ -1,0 +1,128 @@
+define OWNAS = {{bgp_as}};
+define OWNIPv4 = {{bgp_ipv4}};
+define OWNIPv6 = {{bgp_ipv6}};
+
+# Unique identification of router, usually one of its IPv4 addresses
+# router id 198.51.100.1;
+router id OWNIPv4;
+
+# Configure logging
+log "/var/log/bird.log" { debug, info, remote, warning, error, auth, fatal, bug };
+
+# Turn on global debugging of all protocols (all messages or just selected classes)
+# debug protocols all;
+# debug protocols { events, states };
+# debug protocols { states, routes, filters, interfaces, events };
+debug protocols all;
+
+protocol static static4 {
+    check link; 
+    ipv4 {
+        export none;
+    };
+}
+
+protocol static static6 {
+    check link; 
+
+{%- for peer, peerdata in bgp_peers.items() %}
+    route {{peerdata.loopback_ipv6.partition('/')[0]}}/128 via "{{peerdata.ifname_local}}";
+{%- endfor %}
+
+    ipv6 {
+        export none;
+    };
+}
+
+# This pseudo-protocol watches all interface up/down events
+protocol device {
+#    scan time 2;    # Scan interfaces every 2 seconds
+}
+
+protocol direct {
+    ipv4 {
+        import filter {
+            accept;
+        };
+    };
+    ipv6;
+    interface "-eth-inet", "-tlwg*", "*"; # exclude the Internet-facing interface
+}
+
+protocol kernel kernel4 {
+#    scan time 20;
+#    learn;
+    persist;
+#    merge paths;
+#    merge paths yes limit 2;
+#    graceful restart;
+
+    ipv4 {
+        import all;
+        export filter {
+            if proto = "direct1" then reject;
+#            if source = RTS_STATIC then reject;
+#            krt_prefsrc = OWNIPv4;
+            accept;
+        };
+    };
+}
+
+protocol kernel kernel6 {
+#    kernel table 100;
+#    scan time 20;
+#    learn;
+    persist;
+#    merge paths;
+#    graceful restart;
+
+    ipv6 {
+        import all;
+        export filter {
+            if proto = "direct1" then reject;
+#            if source = RTS_STATIC then reject;
+#            krt_prefsrc = OWNIPv6;
+            accept;
+        };
+    };
+}
+
+protocol bfd {
+    #interface "*" {
+    #        min rx interval 100 ms;
+    #        min tx interval 100 ms;
+    #        idle tx interval 300 ms;
+    #        multiplier 10;
+    #        password xyz;
+    #};
+
+    #neighbor 1.1.1.1;
+}
+
+template bgp common {
+    local as OWNAS;
+    source address OWNIPv4;
+    strict bind;
+    multihop 2;
+#    connect retry time 60;
+#    connect retry time 10;
+#    hold time 30;
+    bfd graceful;
+    ttl security;
+#    graceful restart;
+    ipv4 {
+        import limit 1000 action block;
+        import all;
+        export where ((source = RTS_DEVICE) || (source = RTS_STATIC) || (source = RTS_BGP));
+    };
+
+    ipv6 {
+        import limit 1000 action block;
+        import all;
+        export where ((source = RTS_DEVICE) || (source = RTS_STATIC) || (source = RTS_BGP));
+    };
+}
+
+include "bird_site-template.conf";
+
+include "bird_neighbors.conf";

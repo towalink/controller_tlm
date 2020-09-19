@@ -1,0 +1,9 @@
+# Cannot be installed without an explicit pin
+Package: *
+Pin: release a=testing
+Pin-Priority: -10
+
+# Make bird2 and its dependency available from testing
+Package: bird2, libreadline8
+Pin: release a=testing
+Pin-Priority: 50

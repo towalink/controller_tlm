@@ -1,0 +1,15 @@
+[Unit]
+Description=Towalink startup service
+After=network-online.target
+Wants=network-online.target
+Before=bird.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root
+ExecStart=/bin/bash /opt/towalink/startup/towalink.sh
+StandardOutput=file:/var/log/towalink_startup.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

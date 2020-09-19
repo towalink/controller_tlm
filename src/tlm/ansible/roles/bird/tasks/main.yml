@@ -1,0 +1,58 @@
+---
+
+- name: bird - Install required packages (apk)
+  apk:
+    name: bird
+    repository: http://nl.alpinelinux.org/alpine/edge/testing
+    state: present
+  tags: installation
+  when: ansible_facts['os_family'] == 'Alpine'
+
+# http://bird.network.cz/debian/ does not support "armhf" architecture for Raspbian
+#- name: bird - Add bird repository key from a keyserver (apt)
+#  apt_key:
+#    keyserver: keyserver.ubuntu.com
+#    id: B188E2B695BD4743
+#  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+#
+#- name: bird - Install required repository (apt)
+#  apt_repository:
+#    repo: deb http://bird.network.cz/debian/ buster main
+#    state: present
+#  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+   
+- name: bird - Pinning testing repository (apt)
+  copy:
+    src: files/etc_apt_preferencesd/debian-testing
+    dest: /etc/apt/preferences.d/debian-testing
+    mode: 0755
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+
+- name: bird - Install required repository (apt)
+  apt_repository:
+    repo: deb http://raspbian.raspberrypi.org/raspbian/ testing main contrib non-free rpi
+    state: present
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] == 'Raspbian')
+   
+- name: bird - Install required packages (apt)
+  apt:
+    name: bird2
+    state: present
+    # default_release: buster-backports  # bird2 is not yet in backports as of 2020-09-06
+    default_release: testing
+  tags: installation
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+
+- name: bird - Make sure log file has correct permissions
+  file:
+    path: /var/log/bird.log
+    state: touch
+    owner: bird
+    group: bird
+
+- name: bird - Ensure bird is started now and at boot
+  service:
+    name: bird
+    state: started
+    enabled: yes
+  tags: installation

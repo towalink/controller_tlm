@@ -1,0 +1,59 @@
+---
+
+- name: nodeconfig - Checking for towalink-nodeconfig directory existing on Controller
+  local_action: stat path={{ nodeconfig_path }}
+  register: stat_dir_nodeconfig
+
+- name: nodeconfig - Installing required packages (apk)
+  apk:
+    name:
+      - rsync # needed for Ansible synchronize
+      - py3-setuptools # needed to avoid Ansible error
+    state: present
+  tags: installation
+  when: ansible_facts['os_family'] == 'Alpine'
+
+- name: nodeconfig - Installing required packages (apt)
+  apt:
+    name:
+      - rsync # needed for Ansible synchronize
+#      - python3-venv
+    state: present
+  tags: installation
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: nodeconfig - Installing nodeconfig python module
+  pip:
+    name:
+      - towalink-nodeconfig
+    state: present
+    virtualenv: /opt/towalink/venv
+  tags: installation
+  when: not stat_dir_nodeconfig.stat.exists
+
+- name: nodeconfig - Copying Python code to Node
+  synchronize:
+    src: "{{ nodeconfig_path }}"
+    dest: /opt/towalink/nodeconfig
+    rsync_opts:
+     - "--no-motd"
+     - "--exclude=src/towalink_nodeconfig.egg-info"
+  when: stat_dir_nodeconfig.stat.exists
+
+- name: nodeconfig - Installing locally available nodeconfig Python module
+  pip: name='/opt/towalink/nodeconfig'
+       extra_args='-e'
+       virtualenv_command='/usr/bin/python3 -m venv'
+       virtualenv=/opt/towalink/venv
+  when: stat_dir_nodeconfig.stat.exists
+
+- name: nodeconfig - Ensuring script directory exists
+  file:
+    path: /opt/towalink/scripts
+    state: directory
+
+- name: nodeconfig - Copying rsync wrapper script
+  copy:
+    src: files/opt_towalink_scripts/rsync-nodecfg.sh
+    dest: /opt/towalink/scripts/rsync-nodecfg.sh
+    mode: 0755
