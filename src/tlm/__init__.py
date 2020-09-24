@@ -197,7 +197,7 @@ def parseopts():
         operation = 'show'
     if operation == 'create':
         operation = 'add'
-    if (operation == 'delete') and (operation == 'remove'):
+    if (operation == 'delete') or (operation == 'remove'):
         operation = 'del'
     # Two arguments are obligatory
     if len(args) < 2:
