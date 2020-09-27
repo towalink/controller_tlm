@@ -4,7 +4,7 @@
 
 # UDP port used for the management interface (WireGuard listenport)
 # Default: 51820
-#controller_wg_listenport=518220
+#controller_wg_listenport=51820
 
 # WireGuard public key of the controller the node's connect to
 # Default: will be set to the public key belonging to the WireGuard private key of the management interface on this host
