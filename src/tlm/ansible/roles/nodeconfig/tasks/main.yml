@@ -7,8 +7,10 @@
 - name: nodeconfig - Installing required packages (apk)
   apk:
     name:
-      - rsync # needed for Ansible synchronize
+      - py3-pip
       - py3-setuptools # needed to avoid Ansible error
+      - py3-virtualenv # needed to avoid Ansible error
+      - rsync # needed for Ansible synchronize
     state: present
   tags: installation
   when: ansible_facts['os_family'] == 'Alpine'
@@ -27,6 +29,7 @@
     name:
       - towalink-nodeconfig
     state: present
+    extra_args: "{{ '--index-url https://test.pypi.org/project/ --no-deps' if pip_test else omit}}"
     virtualenv: /opt/towalink/venv
   tags: installation
   when: not stat_dir_nodeconfig.stat.exists
