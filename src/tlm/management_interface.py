@@ -30,7 +30,7 @@ class MgmtInterface(object):
     def wgservice(self):
         """Returns the systemd service name for the WireGuard interface"""
         return f'wg-quick@{self.wg_interface}'
-    
+
     @property
     def wg_public(self):
         if self._wg_public is None:
@@ -40,7 +40,7 @@ class MgmtInterface(object):
     def ensure_configuration(self):
         """Makes sure that the WireGuard interface has a basic configuration"""        
         self.wgconfig.add_attr(None, 'PrivateKey', self.wg.generate_privatekey())
-        self.wgconfig.add_attr(None, 'ListenPort', 51820)
+        self.wgconfig.add_attr(None, 'ListenPort', 51820) # *** we need to get the listenport from config
         self.wgconfig.add_attr(None, 'Address', 'fe80::1')
         self.wgconfig.write_file()
 
