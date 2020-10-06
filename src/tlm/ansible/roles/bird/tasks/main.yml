@@ -8,25 +8,27 @@
   tags: installation
   when: ansible_facts['os_family'] == 'Alpine'
 
-# http://bird.network.cz/debian/ does not support "armhf" architecture for Raspbian
-#- name: bird - Add bird repository key from a keyserver (apt)
-#  apt_key:
-#    keyserver: keyserver.ubuntu.com
-#    id: B188E2B695BD4743
-#  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
-#
-#- name: bird - Install required repository (apt)
-#  apt_repository:
-#    repo: deb http://bird.network.cz/debian/ buster main
-#    state: present
-#  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
-   
+# Install from http://bird.network.cz/debian/ since bird2 is currently only in sid
+- name: bird - Add bird repository key from a keyserver (apt)
+  apt_key:
+    # keyserver: keyserver.ubuntu.com  # no longer working as of Oct. 2020
+    url: https://packages.sury.org/bird/apt.gpg
+    id: B188E2B695BD4743
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] != 'Raspbian')
+
+- name: bird - Install required repository (apt)
+  apt_repository:
+    repo: deb http://bird.network.cz/debian/ buster main
+    state: present
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] != 'Raspbian')
+
+# http://bird.network.cz/debian/ does not support "armhf" architecture for Raspbian   
 - name: bird - Pinning testing repository (apt)
   copy:
     src: files/etc_apt_preferencesd/debian-testing
     dest: /etc/apt/preferences.d/debian-testing
     mode: 0755
-  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] == 'Raspbian')
 
 - name: bird - Install required repository (apt)
   apt_repository:
@@ -39,7 +41,7 @@
     name: bird2
     state: present
     # default_release: buster-backports  # bird2 is not yet in backports as of 2020-09-06
-    default_release: testing
+    default_release: "{{ 'testing' if (ansible_facts['lsb']['id'] == 'Raspbian') else omit }}"
   tags: installation
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
 

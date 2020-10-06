@@ -46,7 +46,7 @@ protocol direct {
         };
     };
     ipv6;
-    interface "-eth-inet", "-tlwg_mgmt", "*"; # exclude the Internet-facing interface
+    interface "-eth-inet", "-tlwg_mgmt", "*"; # exclude the Internet-facing interface and the management interface
 }
 
 protocol kernel kernel4 {
@@ -88,14 +88,12 @@ protocol kernel kernel6 {
 }
 
 protocol bfd {
-    #interface "*" {
-    #        min rx interval 100 ms;
-    #        min tx interval 100 ms;
-    #        idle tx interval 300 ms;
-    #        multiplier 10;
-    #        password xyz;
-    #};
-
+    multihop {
+        min rx interval 200 ms;
+        min tx interval 200 ms;
+        idle tx interval 2 s;
+        multiplier 5;
+    };
     #neighbor 1.1.1.1;
 }
 
