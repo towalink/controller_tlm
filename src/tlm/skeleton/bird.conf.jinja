@@ -89,9 +89,9 @@ protocol kernel kernel6 {
 
 protocol bfd {
     multihop {
-        min rx interval 200 ms;
-        min tx interval 200 ms;
-        idle tx interval 2 s;
+        min rx interval 300 ms;
+        min tx interval 300 ms;
+        idle tx interval 5 s;
         multiplier 5;
     };
     #neighbor 1.1.1.1;
@@ -117,7 +117,7 @@ template bgp common {
     ipv6 {
         import limit 1000 action block;
         import all;
-        export where ((source = RTS_DEVICE) || (source = RTS_STATIC) || (source = RTS_BGP));
+        export where (((source = RTS_DEVICE) && (net !~ 2000::/3)) || (source = RTS_STATIC) || (source = RTS_BGP));
     };
 }
 
