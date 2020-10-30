@@ -1,5 +1,5 @@
 {% for peer, peerdata in bgp_peers.items() %}
-protocol bgp '{{peerdata.name}}' from {{site_name}} {
+protocol bgp '{{peerdata.name}}' from '{{site_name}}' {
     neighbor {{peerdata.ip}} as {{peerdata.as}};
     password "{{peerdata.password}}";
 }
