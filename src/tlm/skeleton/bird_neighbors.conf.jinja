@@ -1,6 +1,7 @@
 {% for peer, peerdata in bgp_peers.items() %}
 protocol bgp '{{peerdata.name}}' from '{{site_name}}' {
     neighbor {{peerdata.ip}} as {{peerdata.as}};
-    password "{{peerdata.password}}";
+    #You may uncomment the password attribute if you only use Nodes with kernels that support TCP MD5 checksums
+    #password "{{peerdata.password}}";
 }
 {% endfor %}
