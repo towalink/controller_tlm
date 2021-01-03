@@ -23,7 +23,7 @@ setup_kwargs = {
                          'toml',
                          'tomlkit',
                          'ansible',
-                         'wgconfig'
+                         'wgconfig>=0.1.4'
                         ],
     'entry_points': '''
         [console_scripts]
@@ -39,8 +39,9 @@ setup_kwargs = {
         #'Development Status :: 4 - Beta',
         #'Development Status :: 5 - Production/Stable',
         'Intended Audience :: System Administrators',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Information Technology'
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: Telecommunications Industry',
+        'Topic :: System :: Networking'
     ],
     'python_requires': '>=3.6',
     'keywords': 'Towalink VPN SD-WAN WireGuard',

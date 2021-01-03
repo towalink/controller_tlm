@@ -142,7 +142,7 @@ class ConfigManager():
 
     def del_node(self, node):
         """Deletes a node"""
-        if node.isnumeric():
+        if str(node).isnumeric():
             node = int(node)
             if not node in self.nodes:
                 raise ValueError('The specified node identifier is invalid')        

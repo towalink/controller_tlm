@@ -4,9 +4,9 @@
 
 import logging
 import wgconfig
+import wgconfig.wgexec as wgexec
 
 from . import exechelper
-from .configmanager import wireguard
 
 
 logger = logging.getLogger(__name__);
@@ -20,7 +20,6 @@ class MgmtInterface(object):
         self.wg_interface = wg_interface 
         self._wg_public = None
         self.wgconfig = wgconfig.WGConfig(self.wg_interface)
-        self.wg = wireguard.Wireguard()
         try:
             self.wgconfig.read_file()
         except FileNotFoundError:
@@ -34,12 +33,12 @@ class MgmtInterface(object):
     @property
     def wg_public(self):
         if self._wg_public is None:
-            self._wg_public = self.wg.get_publickey(self.wgconfig.interface['PrivateKey'])
+            self._wg_public = wgexec.get_publickey(self.wgconfig.interface['PrivateKey'])
         return self._wg_public
     
     def ensure_configuration(self):
         """Makes sure that the WireGuard interface has a basic configuration"""        
-        self.wgconfig.add_attr(None, 'PrivateKey', self.wg.generate_privatekey())
+        self.wgconfig.add_attr(None, 'PrivateKey', wgexec.generate_privatekey())
         self.wgconfig.add_attr(None, 'ListenPort', 51820) # *** we need to get the listenport from config
         self.wgconfig.add_attr(None, 'Address', 'fe80::1')
         self.wgconfig.write_file()
@@ -69,9 +68,7 @@ class MgmtInterface(object):
     def remove_peer_byallowedip(self, wg_allowedip):
         """Remove the (first) peer with the given AllowedIP"""
         for peer, peerdata in self.wgconfig.peers.items():
-            allowedips = peerdata.get('AllowedIPs', '')
-            allowedips = allowedips.split(',')
-            allowedips = [item.strip() for item in allowedips]
+            allowedips = peerdata.get('AllowedIPs', list())
             if wg_allowedip in allowedips:
                 self.wgconfig.del_peer(peer)
                 break
