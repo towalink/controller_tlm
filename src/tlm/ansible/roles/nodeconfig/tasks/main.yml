@@ -19,7 +19,7 @@
   apt:
     name:
       - rsync # needed for Ansible synchronize
-      - python3-virtualenv
+      - python3-venv # added due to Sebastian's report on certain Debian version
     state: present
   tags: installation
   when: ansible_facts['os_family'] == 'Debian'
