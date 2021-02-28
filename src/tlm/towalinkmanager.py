@@ -2,6 +2,7 @@
 
 """Interface class to control the current Towalink installation"""
 
+import ast
 import logging
 import pprint
 
@@ -176,11 +177,16 @@ class TLM():
 
     def set_conf(self, confobj, attr, value):
         """Sets an attribute in the given configuration object"""
-        if value.isnumeric():
-            value = int(value)
         if value == 'empty':
             confobj.delete_item(attr)
         else:
+            # In case of a list, parse it to a list
+            if (value[0] == '[') and (value[-1] == ']'):
+                value = ast.literal_eval(value)
+            # Numbers are newer stored as strings
+            if isinstance(value, str) and value.isnumeric():
+                value = int(value)
+            # Set new value
             confobj.set_item(attr, value)
         confobj.save_config()
 
