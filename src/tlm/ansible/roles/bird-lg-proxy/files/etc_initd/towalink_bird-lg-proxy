@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+
+depend() {
+        need net
+        need bird
+}
+
+name=towalink_bird-lg-proxy
+command=/opt/towalink/bird-lg-go/bird-lg-proxy
+command_args="-bird /var/run/bird.ctl -allowed fe80::1%tlwg_mgmt"
+pidfile=/run/$RC_SVCNAME.pid
+command_background=true

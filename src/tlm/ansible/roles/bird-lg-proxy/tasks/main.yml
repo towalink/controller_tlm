@@ -1,0 +1,31 @@
+---
+
+- name: bird-lg-proxy - Create bird-lg-go directory
+  file:
+    path: /opt/towalink/bird-lg-go
+    state: directory
+
+- name: bird-lg-proxy - Download bird-lg-go-proxy
+  get_url:
+    url: https://install.towalink.net/bird-lg-go/bird-lg-proxy
+    dest: /opt/towalink/bird-lg-go/bird-lg-proxy
+    mode: 0740
+
+- name: bird-lg-proxy - Copying init script (Alpine)
+  copy:
+    src: files/etc_initd/towalink_bird-lg-proxy
+    dest: /etc/init.d/towalink_bird-lg-proxy
+    mode: 0755
+  when: ansible_facts['os_family'] == 'Alpine'
+
+- name: bird-lg-proxy - Copying init script (Debian)
+  copy:
+    src: files/etc_systemd_system/towalink_bird-lg-proxy.service
+    dest: /etc/systemd/system/towalink_bird-lg-proxy.service
+    mode: 0755
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: bird-lg-proxy - Enable bird-lg-proxy service
+  service:
+    name: towalink_bird-lg-proxy
+    enabled: yes

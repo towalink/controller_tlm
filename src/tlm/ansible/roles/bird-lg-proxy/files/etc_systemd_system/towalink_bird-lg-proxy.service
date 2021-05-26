@@ -1,0 +1,15 @@
+[Unit]
+Description=Towalink bird-lg-proxy service
+After=network-online.target
+Wants=network-online.target
+After=bird.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root
+ExecStart=/opt/towalink/bird-lg-go/bird-lg-proxy -bird /var/run/bird/bird.ctl -allowed fe80::1%%tlwg_mgmt
+StandardOutput=file:/var/log/towalink_bird-lg-proxy.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
