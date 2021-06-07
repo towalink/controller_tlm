@@ -144,6 +144,7 @@ class ConfigOrchestrator():
                     peer = list(linkname.partition('-'))[0::2] # get the two peers without delimiter
                     peer.remove(str(node_id))
                     peer = peer[0]
+                    peerdata = self.cm.nodes.get(int(peer))
                     # Wireguard attributes
                     wg_ifname = f'tlwg_{peer}'
                     cfg_effective.set_item(f'wg_links.{peer}.wg_ifname', wg_ifname)
@@ -175,7 +176,7 @@ class ConfigOrchestrator():
                 if data.get('active'):
                     # BGP attributes
                     cfg_effective.set_item(f'bgp_peers.{peer}.as', bgp_as_base + int(peer))
-                    cfg_effective.set_item(f'bgp_peers.{peer}.name', 'node_' + peer)
+                    cfg_effective.set_item(f'bgp_peers.{peer}.name', '{site_name}_{node_name}_{peer}'.format(site_name=peerdata.complete_cfg.get('site_name'), node_name=peerdata.complete_cfg.get('node_name'), peer=peer))
                     cfg_effective.set_item(f'bgp_peers.{peer}.ip', self.get_ipaddress_byoffset(loopbacknet_ipv4, offset=int(peer), add_prefixlen=False))
                     cfg_effective.set_item(f'bgp_peers.{peer}.loopback_ipv4', self.get_ipaddress_byoffset(loopbacknet_ipv4, offset=int(peer), keep_prefixlen=True))
                     cfg_effective.set_item(f'bgp_peers.{peer}.loopback_ipv6', self.get_ipaddress_byoffset(loopbacknet_ipv6, offset=int(peer), keep_prefixlen=True))

@@ -71,7 +71,7 @@ class TOMLConfigHierarchy(tomlconfig.TOMLConfig):
         
     @property
     def complete_cfg_nested(self):
-        """Returns an ordered nexted dictionary of the complete configuration"""
+        """Returns an ordered nested dictionary of the complete configuration"""
         result = dict()
         for itemname, value in sorted(self.complete_cfg.items()):
             parts = itemname.split('.')
