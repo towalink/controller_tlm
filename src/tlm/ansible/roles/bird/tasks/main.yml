@@ -51,6 +51,8 @@
     state: touch
     owner: bird
     group: bird
+    access_time: preserve
+    modification_time: preserve
 
 - name: bird - Ensure bird is started now and at boot
   service:
