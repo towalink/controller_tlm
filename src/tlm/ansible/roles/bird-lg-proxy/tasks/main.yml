@@ -28,4 +28,5 @@
 - name: bird-lg-proxy - Enable bird-lg-proxy service
   service:
     name: towalink_bird-lg-proxy
+    state: started
     enabled: yes
