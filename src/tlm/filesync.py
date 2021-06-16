@@ -50,14 +50,16 @@ class FileSync(object):
  
     def mirror_node_configs(self, hostname):
         """Mirror a Node's config files to the Node"""
+        logger.info(f'Mirroring configs to {hostname}')
         src = self.sourcepath + '/'
         dst = '[' + hostname + ']:' + self.destpath
         excludes = ['tmp', 'new', 'active']
         #rsync -a --exclude=new --exclude=tmp --exclude=active /etc/towalink/effective/node_12/ [fe80::c%tlwg_mgmt]:/etc/towalink/configs
-        return self.exec_rsync(src=src, dst=dst, options=['-a', '-q'], excludes=excludes)
+        return self.exec_rsync(src=src, dst=dst, options=['-a', '-q', '-e', '"ssh -o ConnectTimeout=2"'], excludes=excludes)
 
     def mirror_node_active(self, hostname):
         """Mirror a Node's active config version to the Node"""
+        logger.info(f'Mirroring active config to {hostname}')
         src = os.path.join(self.sourcepath, 'active')
         dst = '[' + hostname + ']:' + self.destpath
-        return self.exec_rsync(src=src, dst=dst, options=['-a', '-q'], rsync_path=RSYNC_PATH_SPECIAL)
+        return self.exec_rsync(src=src, dst=dst, options=['-a', '-q', '-e', '"ssh -o ConnectTimeout=2"'], rsync_path=RSYNC_PATH_SPECIAL)
