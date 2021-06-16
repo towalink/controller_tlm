@@ -68,7 +68,12 @@ def exec_ansible_fornodes(nodes, *ansible_args, playbook=False):
         raise ValueError('No attached nodes selected')
     addresses = ','.join(nodes_in.values())
     command = f'{command} -i "{addresses}," ' + ' '.join(ansible_args)
-    return execute(command)
+    try:
+        execute(command)
+        return 0
+    except subprocess.CalledProcessError as e:
+        logger.warning(f'Calling Ansible returned with non-zero return code [{e.returncode}: {str(e)}]')
+        return e.returncode
 
 
 if __name__ == '__main__':
