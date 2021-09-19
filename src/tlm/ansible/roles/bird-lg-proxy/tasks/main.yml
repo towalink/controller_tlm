@@ -4,12 +4,21 @@
   file:
     path: /opt/towalink/bird-lg-go
     state: directory
+    mode: 0755
 
-- name: bird-lg-proxy - Download bird-lg-go-proxy
+- name: bird-lg-proxy - Download bird-lg-go-proxy (amd64 [x86_64] architecture)
   get_url:
-    url: https://install.towalink.net/bird-lg-go/bird-lg-proxy
+    url: https://install.towalink.net/bird-lg-go/bird-lg-proxy_amd64
     dest: /opt/towalink/bird-lg-go/bird-lg-proxy
     mode: 0740
+  when: (ansible_architecture == 'x86_64')
+
+- name: bird-lg-proxy - Download bird-lg-go-proxy (arm architecture)
+  get_url:
+    url: https://install.towalink.net/bird-lg-go/bird-lg-proxy_arm
+    dest: /opt/towalink/bird-lg-go/bird-lg-proxy
+    mode: 0740
+  when: (ansible_architecture[0:3] == 'arm')
 
 - name: bird-lg-proxy - Copying init script (Alpine)
   copy:
