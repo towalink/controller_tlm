@@ -270,7 +270,7 @@ def main():
     """Main function"""
     loglevel, method, method_args = parseopts()
     logging.basicConfig(format='%(asctime)s %(levelname)s %(module)s: %(message)s', level=loglevel)  # use %(name)s instead of %(module) to include hierarchy information, see https://docs.python.org/2/library/logging.html
-    logger = logging.getLogger(__name__);
+    logger = logging.getLogger(__name__)
     tlm = towalinkmanager.TLM()
     method = getattr(tlm, method)
     exceptionlogger.call(method, *method_args, reraise_exceptions=True)
