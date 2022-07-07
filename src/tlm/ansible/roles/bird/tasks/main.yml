@@ -9,34 +9,34 @@
   when: ansible_facts['os_family'] == 'Alpine'
 
 # Install from http://bird.network.cz/debian/ since bird2 is currently only in sid
-- name: bird - Add bird repository key from a keyserver (apt)
+- name: bird - Add bird repository key from a keyserver (apt, Buster)
   apt_key:
     # keyserver: keyserver.ubuntu.com  # no longer working as of Oct. 2020
     url: https://packages.sury.org/bird/apt.gpg
     id: B188E2B695BD4743
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] != 'Raspbian')
 
-- name: bird - Install required repository (apt)
+- name: bird - Install required repository (apt, Buster)
   apt_repository:
     repo: deb http://bird.network.cz/debian/ buster main
     state: present
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] != 'Raspbian')
 
 # http://bird.network.cz/debian/ does not support "armhf" architecture for Raspbian   
-- name: bird - Pinning testing repository (apt)
+- name: bird - Pinning testing repository (apt, Buster)
   copy:
     src: files/etc_apt_preferencesd/debian-testing
     dest: /etc/apt/preferences.d/debian-testing
     mode: 0755
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] == 'Raspbian')
 
-- name: bird - Install required repository (apt)
+- name: bird - Install required repository (apt, Buster)
   apt_repository:
     repo: deb http://raspbian.raspberrypi.org/raspbian/ testing main contrib non-free rpi
     state: present
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster') and (ansible_facts['lsb']['id'] == 'Raspbian')
    
-- name: bird - Install required packages (apt)
+- name: bird - Install required packages (apt, Buster)
   apt:
     name: bird2
     state: present
@@ -44,6 +44,13 @@
     default_release: "{{ 'testing' if (ansible_facts['lsb']['id'] == 'Raspbian') else omit }}"
   tags: installation
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
+
+- name: bird - Install required packages (apt, Bullseye)
+  apt:
+    name: bird2
+    state: present
+  tags: installation
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'bullseye')
 
 - name: bird - Make sure log file has correct permissions
   file:
