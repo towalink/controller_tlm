@@ -306,7 +306,7 @@ class ConfigOrchestrator():
                 os.unlink(os.path.join(nodedir, 'active'))
             os.symlink(versiondir, os.path.join(nodedir, 'active'))
             # Mirroring changes to node
-            logger.debug(f'Activating config for node [{node_id}]')
+            logger.info(f'Activating config for node [{node_id}]')
             fs = filesync.FileSync(sourcepath=self.get_node_dir(node_id), destpath=NODE_CONFIG_PATH)
             fs.mirror_node_active(mgmt_address)
 
