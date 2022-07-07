@@ -238,7 +238,7 @@ class TLM():
         nodes, changed = self.co.process_new_configversion_site(site)
         if self.print_nodes(changed, reference_complete_cfg = True) == 0:
             print('No node configuration has changed; no new version created')
-        print('Mirroring any existing configs to {len(nodes)} node(s)...')
+        print(f'Mirroring any existing configs to {len(nodes)} node(s)...')
         self.co.mirror_node_configs(nodes.keys())
         print('Done')
 
