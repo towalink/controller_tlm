@@ -1,6 +1,6 @@
 ---
 - name: main task
-  hosts: "{{ variable_host | default('nodes') }}"
+  hosts: "{{ variable_host | default('all') }}"
 #  hosts: nodes
 #  connection: local
   vars_files:
