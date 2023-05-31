@@ -366,3 +366,8 @@ class TLM():
     def ansible_playbook_node(self, node, *ansible_args):
         """Calls 'ansible-playbook' for the given node"""
         return self.ansible_generic_node(node, *ansible_args, playbook=True)
+
+    def git(self, *git_args):
+        """Calls 'git' for the Towalink config directory as local repository"""
+        print('git', git_args)
+        #return

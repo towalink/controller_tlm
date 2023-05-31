@@ -4,7 +4,7 @@
 
 """
 Towalink
-Copyright (C) 2020-2022 Dirk Henrici
+Copyright (C) 2020-2023 Dirk Henrici
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -85,6 +85,7 @@ def usage():
     print('          %s ansible-playbook site <sitename> <arguments...>' % name)
     print('          %s ansible-playbook node <nodename>.<sitename> <arguments...>' % name)
     print('          %s ansible-playbook node <nodeid> <arguments...>' % name)
+    print('          %s git <git arguments...>' % name)
     print()
 
 def show_usage_and_exit(text = None):
@@ -190,7 +191,7 @@ def parseopts():
     if len(args) == 0:
         show_usage_and_exit('Welcome to Towalink!')
     operation = args[0]
-    if not operation in ['list', 'show', 'show-all', 'show_all', 'query', 'add', 'create', 'del', 'delete', 'remove', 'set', 'commit', 'activate', 'attach', 'ansible', 'ansible-playbook', 'ansible_playbook']:
+    if not operation in ['list', 'show', 'show-all', 'show_all', 'query', 'add', 'create', 'del', 'delete', 'remove', 'set', 'commit', 'activate', 'attach', 'ansible', 'ansible-playbook', 'ansible_playbook', 'git']:
         show_usage_and_exit(f'provided operation [{operation}] is invalid')
     # Deal with synonyms    
     if operation == 'query':
@@ -202,9 +203,13 @@ def parseopts():
     # Two arguments are obligatory
     if len(args) < 2:
         show_usage_and_exit('not enough arguments provided for this operation')
-    # Case when three arguments are expected: <operation> <entity> [identifier]
-    method = operation + '_' + args[1]
+    # Evaluate operation
+    if operation == 'git':
+        method = 'git'
+    else:  # case when three arguments are expected: <operation> <entity> [identifier]
+        method = operation + '_' + args[1]
     entity_id = None
+    arguments = args[2:]
     if method == 'list_sites':
         expect_arg(None)
     elif method == 'list_nodes':
@@ -261,10 +266,13 @@ def parseopts():
         _ = expect_arg('siteany')
     elif (method == 'ansible-playbook_node') or (method == 'ansible_playbook_node'):
         _ = expect_arg('nodeany')
+    elif method == 'git':
+        _ = expect_arg('globalany')
+        arguments = args[1:]  # forward all git arguments
     else:
         show_usage_and_exit('the provided combination of operation and entity is not supported')
-    method = method.replace('-', '_') # dashes are not supported in method names in Python
-    return loglevel, method, args[2:]
+    method = method.replace('-', '_')  # dashes are not supported in method names in Python
+    return loglevel, method, arguments
 
 def main():
     """Main function"""
