@@ -8,6 +8,7 @@ import pprint
 
 from . import ansiblecaller
 from . import configorchestrator
+from . import git
 from . import nodeattacher
 
 
@@ -369,5 +370,4 @@ class TLM():
 
     def git(self, *git_args):
         """Calls 'git' for the Towalink config directory as local repository"""
-        print('git', git_args)
-        #return
+        return git.call_git(*git_args)
