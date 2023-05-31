@@ -1,4 +1,5 @@
 import logging
+import os
 import textwrap
 
 
@@ -13,6 +14,23 @@ gitignore_template = r'''
 gitignore_template = textwrap.dedent(gitignore_template).lstrip()
 
 
-def call_git(*git_args):
-    """Call git with the provided arguments"""
-    print('git', git_args)
+class Git():
+    """Class for calling git"""
+
+    def __init__(self, confdir='/etc/towalink'):
+        """Initializer"""
+        self.confdir = confdir    
+
+    def ensure_gitignore(self):
+        """Ensure that a .gitignore file is present in the config directory"""
+        filename = os.path.join(self.confdir, '.gitignore')
+        if not os.path.isfile(filename):
+            with open(filename, 'w') as f:
+                f.write(gitignore_template)
+
+    @staticmethod
+    def call_git(confdir, *git_args):
+        """Call git with the provided arguments"""
+        git = Git(confdir)
+        print('git', git_args)
+    

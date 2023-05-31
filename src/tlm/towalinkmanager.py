@@ -20,10 +20,10 @@ class TLM():
     """Interface class to control the current Towalink installation"""
     co = None # holds an instance of ConfigOrchestrator
 
-    def __init__(self):
-        """Constructor"""
-#        self.co = configorchestrator.ConfigOrchestrator('/mnt/hdd1/dirk/AnnikaDirk/Versionsverwaltung/towalink/tlm/example/etc/towalink/')
-        self.co = configorchestrator.ConfigOrchestrator()
+    def __init__(self, confdir='/etc/towalink'):
+        """Initializer"""
+        self.confdir = confdir
+        self.co = configorchestrator.ConfigOrchestrator(confdir)
         #self.co.update_all()
         #self.co.process_new_configversion_all()
 
@@ -370,4 +370,4 @@ class TLM():
 
     def git(self, *git_args):
         """Calls 'git' for the Towalink config directory as local repository"""
-        return git.call_git(*git_args)
+        return git.Git.call_git(self.confdir, *git_args)

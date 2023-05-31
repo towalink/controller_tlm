@@ -29,7 +29,7 @@ class ConfigOrchestrator():
     """Class for managing the complete config directory hierarchy"""
 
     def __init__(self, confdir='/etc/towalink'):
-        """Constructor"""
+        """Initializer"""
         self.confdir = confdir
         self.prepare_confdir()
         self.confdir_effective = os.path.join(self.confdir, 'effective')
