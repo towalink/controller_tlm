@@ -7,7 +7,7 @@ with open('README.md', 'r') as f:
 
 setup_kwargs = {
     'name': 'towalink_tlm',
-    'version': '0.1.9',
+    'version': '0.2.0',
     'author': 'The Towalink Project',
     'author_email': 'pypi.tlm@towalink.net',
     'description': 'command line tool for configuring and managing a Towalink installation',
@@ -34,9 +34,7 @@ setup_kwargs = {
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Operating System :: POSIX :: Linux',
-        #'Development Status :: 2 - Pre-Alpha',
-        'Development Status :: 3 - Alpha',
-        #'Development Status :: 4 - Beta',
+        'Development Status :: 4 - Beta',
         #'Development Status :: 5 - Production/Stable',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Information Technology',
