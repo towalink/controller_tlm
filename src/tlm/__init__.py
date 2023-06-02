@@ -70,9 +70,9 @@ def usage():
     print('          %s set node <nodename>.<sitename> <attr> <value>' % name)
     print('          %s set node <nodeid> <attr> <value>' % name)
     print('          %s list changed' % name)
-    print('          %s commit all' % name)
-    print('          %s commit site <sitename>' % name)
-    print('          %s commit node <nodename>.<sitename>' % name)
+    print('          %s commit -m mymessage all' % name)
+    print('          %s commit -m mymessage site <sitename>' % name)
+    print('          %s commit -m mymessage node <nodename>.<sitename>' % name)
     print('          %s activate all' % name)
     print('          %s activate site <sitename> <version>' % name)
     print('          %s activate node <nodename>.<sitename> <version>' % name)
@@ -165,15 +165,23 @@ def parseopts():
         else:
             raise ValueError('unsupported number of arguments')
 
+    # Workaround to convert "tlm commit -m message" into "tlm -m message commit" so that it can then be parsed regularly
+    if (len(sys.argv) > 3) and (sys.argv[2] == '-m'):
+        sys.argv = [ sys.argv[0], sys.argv[2], sys.argv[3], sys.argv[1] ] + sys.argv[4:]
+    # Parse arguments using "getopt"
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'l:?', ['help', 'loglevel='])
+        opts, args = getopt.getopt(sys.argv[1:], 'm:l:?', ['help', 'loglevel='])
     except getopt.GetoptError as ex:
         # Print help information and exit
         show_usage_and_exit(ex) # will print something like "option -a not recognized"
+    # Evaluate parsed arguments
+    message = None
     loglevel = logging.INFO
     for o, a in opts:
         if o in ('-?', '--help'):
             show_usage_and_exit()
+        elif o == '-m':
+            message = a
         elif o in ('-l', '--loglevel'):
             a = a.lower()
             if a == 'debug':
@@ -272,16 +280,22 @@ def parseopts():
     else:
         show_usage_and_exit('the provided combination of operation and entity is not supported')
     method = method.replace('-', '_')  # dashes are not supported in method names in Python
-    return loglevel, method, arguments
+    kwarguments = dict()
+    if message is not None:
+        if operation == 'commit':
+            kwarguments['message'] = message
+        else:
+            show_usage_and_exit('"-m" may only be provided for "tlm commit"')
+    return loglevel, method, arguments, kwarguments
 
 def main():
     """Main function"""
-    loglevel, method, method_args = parseopts()
+    loglevel, method, method_args, method_kwargs = parseopts()
     logging.basicConfig(format='%(asctime)s %(levelname)s %(module)s: %(message)s', level=loglevel)  # use %(name)s instead of %(module) to include hierarchy information, see https://docs.python.org/2/library/logging.html
     logger = logging.getLogger(__name__)
     tlm = towalinkmanager.TLM()
     method = getattr(tlm, method)
-    exceptionlogger.call(method, *method_args, reraise_exceptions=True)
+    exceptionlogger.call(method, *method_args, **method_kwargs, reraise_exceptions=True)
 
 
 if __name__ == "__main__":

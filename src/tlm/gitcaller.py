@@ -49,7 +49,16 @@ class Git():
                     return True
         return False
 
-    def execute_git(self, *git_args):
+    def execute_git_commit(self, message=None):
+        """Commit config changes in the config directory"""
+        if message is None:
+            message = 'New config version'
+        if self.execute_git('add', '.'):
+            if self.execute_git('commit', '-m', message, nowarnings=True):
+                return True
+        return False
+
+    def execute_git(self, *git_args, nowarnings=False):
         """Execute git command with the provided arguments"""
         logger.debug(f'Executing [git -C {self.confdir} {" ".join(git_args)}]')
         args = ['git', '-C', self.confdir]
@@ -57,7 +66,8 @@ class Git():
         try:
             subprocess.check_call(args)
         except subprocess.CalledProcessError as e:
-            logger.warning(f'Ignoring error when calling git [{e}]')
+            if not nowarnings:
+                logger.warning(f'Ignoring error when calling git [{e}]')
             return False
         return True
 
@@ -70,3 +80,13 @@ class Git():
             git.execute_git(*git_args)
         else:
             logger.error(f'git could not be initialized; thus not possible calling git')
+
+    @staticmethod
+    def call_git_commit(confdir, message):
+        """Call git commit with the provided commit message"""
+        logger.debug(f'Calling [git -C {confdir} commit -m {message}]')
+        git = Git(confdir)
+        if git.ensure_git():
+            git.execute_git_commit(message)
+        else:
+            logger.error(f'git could not be initialized; thus not possible calling git commit')

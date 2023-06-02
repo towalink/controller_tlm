@@ -217,33 +217,37 @@ class TLM():
     def list_changed(self):
         """Prints all sites with changes configuration"""
         self.co.update_all()
-        nodes, changed = self.co.process_new_configversion_all(dryrun = True)
-        if self.print_nodes(changed, reference_complete_cfg = True) == 0:
+        nodes, changed = self.co.process_new_configversion_all(dryrun=True)
+        if self.print_nodes(changed, reference_complete_cfg=True) == 0:
             print('No node configuration has changed')
 
-    def commit_all(self):
+    def commit_all(self, message=None):
         """Creates a new version of effective configuration for all nodes"""
         self.co.cm.update_generated_config()
         self.co.update_all()
         nodes, changed = self.co.process_new_configversion_all()
-        if self.print_nodes(changed, reference_complete_cfg = True) == 0:
+        if self.print_nodes(changed, reference_complete_cfg=True) == 0:
             print('No node configuration has changed; no new version created')
+        else:
+            gitcaller.Git.call_git_commit(self.confdir, message)
         print('Mirroring any existing configs to nodes...')
         self.co.mirror_node_configs(nodes.keys())
         print('Done')
 
-    def commit_site(self, site):
+    def commit_site(self, site, message=None):
         """Creates a new version of effective configuration for all nodes of the given site"""
         self.co.cm.update_generated_config()
         self.co.update_site(site)
         nodes, changed = self.co.process_new_configversion_site(site)
-        if self.print_nodes(changed, reference_complete_cfg = True) == 0:
+        if self.print_nodes(changed, reference_complete_cfg=True) == 0:
             print('No node configuration has changed; no new version created')
+        else:
+            gitcaller.Git.call_git_commit(self.confdir, message)
         print(f'Mirroring any existing configs to {len(nodes)} node(s)...')
         self.co.mirror_node_configs(nodes.keys())
         print('Done')
 
-    def commit_node(self, node):
+    def commit_node(self, node, message=None):
         """Creates a new version of effective configuration for the given node"""
         try:
             node = self.get_nodeid(node)
@@ -255,8 +259,10 @@ class TLM():
         changed = self.co.process_new_configversion(node)
         changed = {node: self.co.cm.nodes[node]} if changed else dict()
         nodes = [node]
-        if self.print_nodes(changed, reference_complete_cfg = True) == 0:
+        if self.print_nodes(changed, reference_complete_cfg=True) == 0:
             print('Node configuration has not changed; nothing done')
+        else:
+            gitcaller.Git.call_git_commit(self.confdir, message)
         print('Mirroring any existing configs to node...')
         self.co.mirror_node_configs(nodes)
         print('Done')
