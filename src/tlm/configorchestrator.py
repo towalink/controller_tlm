@@ -90,7 +90,7 @@ class ConfigOrchestrator():
     def render_template_files(self, data, dir):
         """Renders the Jinja template files in the given directory using the provided data dictionary"""
         jt = jinjatransformer.JinjaTransformer(templatedir=dir, globalvars=dict({'grains': dict({'id': 'test'})}))
-        # Normal JInga template files
+        # Normal Jinga template files
         jt.render_templatefiles_to_files(dir, data=data, filter_ignore=['tlwg.conf.jinja'])
         # Wireguard interface configs
         for wglink in data.get('wg_links', dict()).values():
