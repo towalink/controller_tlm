@@ -232,7 +232,7 @@ class TLM():
             gitcaller.Git.call_git_commit(self.confdir, message)
         print('Mirroring any existing configs to nodes...')
         self.co.mirror_node_configs(nodes.keys())
-        print('Done')
+        print('Done (hint: use "tlm activate" to activate a new configuration)')
 
     def commit_site(self, site, message=None):
         """Creates a new version of effective configuration for all nodes of the given site"""
@@ -245,7 +245,7 @@ class TLM():
             gitcaller.Git.call_git_commit(self.confdir, message)
         print(f'Mirroring any existing configs to {len(nodes)} node(s)...')
         self.co.mirror_node_configs(nodes.keys())
-        print('Done')
+        print('Done (hint: use "tlm activate" to activate a new configuration)')
 
     def commit_node(self, node, message=None):
         """Creates a new version of effective configuration for the given node"""
@@ -265,7 +265,7 @@ class TLM():
             gitcaller.Git.call_git_commit(self.confdir, message)
         print('Mirroring any existing configs to node...')
         self.co.mirror_node_configs(nodes)
-        print('Done')
+        print('Done (hint: use "tlm activate" to activate a new configuration)')
 
     def attach_node(self, node):
         """Pairs a config-requesting device as the provided node"""
