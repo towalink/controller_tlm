@@ -4,7 +4,7 @@
 
 """
 Towalink
-Copyright (C) 2020-2022 Dirk Henrici
+Copyright (C) 2020-2023 Dirk Henrici
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -70,9 +70,9 @@ def usage():
     print('          %s set node <nodename>.<sitename> <attr> <value>' % name)
     print('          %s set node <nodeid> <attr> <value>' % name)
     print('          %s list changed' % name)
-    print('          %s commit all' % name)
-    print('          %s commit site <sitename>' % name)
-    print('          %s commit node <nodename>.<sitename>' % name)
+    print('          %s commit -m mymessage all' % name)
+    print('          %s commit -m mymessage site <sitename>' % name)
+    print('          %s commit -m mymessage node <nodename>.<sitename>' % name)
     print('          %s activate all' % name)
     print('          %s activate site <sitename> <version>' % name)
     print('          %s activate node <nodename>.<sitename> <version>' % name)
@@ -85,6 +85,7 @@ def usage():
     print('          %s ansible-playbook site <sitename> <arguments...>' % name)
     print('          %s ansible-playbook node <nodename>.<sitename> <arguments...>' % name)
     print('          %s ansible-playbook node <nodeid> <arguments...>' % name)
+    print('          %s git <git arguments...>' % name)
     print()
 
 def show_usage_and_exit(text = None):
@@ -164,15 +165,23 @@ def parseopts():
         else:
             raise ValueError('unsupported number of arguments')
 
+    # Workaround to convert "tlm commit -m message" into "tlm -m message commit" so that it can then be parsed regularly
+    if (len(sys.argv) > 3) and (sys.argv[2] == '-m'):
+        sys.argv = [ sys.argv[0], sys.argv[2], sys.argv[3], sys.argv[1] ] + sys.argv[4:]
+    # Parse arguments using "getopt"
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'l:?', ['help', 'loglevel='])
+        opts, args = getopt.getopt(sys.argv[1:], 'm:l:?', ['help', 'loglevel='])
     except getopt.GetoptError as ex:
         # Print help information and exit
         show_usage_and_exit(ex) # will print something like "option -a not recognized"
+    # Evaluate parsed arguments
+    message = None
     loglevel = logging.INFO
     for o, a in opts:
         if o in ('-?', '--help'):
             show_usage_and_exit()
+        elif o == '-m':
+            message = a
         elif o in ('-l', '--loglevel'):
             a = a.lower()
             if a == 'debug':
@@ -190,7 +199,7 @@ def parseopts():
     if len(args) == 0:
         show_usage_and_exit('Welcome to Towalink!')
     operation = args[0]
-    if not operation in ['list', 'show', 'show-all', 'show_all', 'query', 'add', 'create', 'del', 'delete', 'remove', 'set', 'commit', 'activate', 'attach', 'ansible', 'ansible-playbook', 'ansible_playbook']:
+    if not operation in ['list', 'show', 'show-all', 'show_all', 'query', 'add', 'create', 'del', 'delete', 'remove', 'set', 'commit', 'activate', 'attach', 'ansible', 'ansible-playbook', 'ansible_playbook', 'git']:
         show_usage_and_exit(f'provided operation [{operation}] is invalid')
     # Deal with synonyms    
     if operation == 'query':
@@ -202,9 +211,13 @@ def parseopts():
     # Two arguments are obligatory
     if len(args) < 2:
         show_usage_and_exit('not enough arguments provided for this operation')
-    # Case when three arguments are expected: <operation> <entity> [identifier]
-    method = operation + '_' + args[1]
+    # Evaluate operation
+    if operation == 'git':
+        method = 'git'
+    else:  # case when three arguments are expected: <operation> <entity> [identifier]
+        method = operation + '_' + args[1]
     entity_id = None
+    arguments = args[2:]
     if method == 'list_sites':
         expect_arg(None)
     elif method == 'list_nodes':
@@ -261,19 +274,28 @@ def parseopts():
         _ = expect_arg('siteany')
     elif (method == 'ansible-playbook_node') or (method == 'ansible_playbook_node'):
         _ = expect_arg('nodeany')
+    elif method == 'git':
+        _ = expect_arg('globalany')
+        arguments = args[1:]  # forward all git arguments
     else:
         show_usage_and_exit('the provided combination of operation and entity is not supported')
-    method = method.replace('-', '_') # dashes are not supported in method names in Python
-    return loglevel, method, args[2:]
+    method = method.replace('-', '_')  # dashes are not supported in method names in Python
+    kwarguments = dict()
+    if message is not None:
+        if operation == 'commit':
+            kwarguments['message'] = message
+        else:
+            show_usage_and_exit('"-m" may only be provided for "tlm commit"')
+    return loglevel, method, arguments, kwarguments
 
 def main():
     """Main function"""
-    loglevel, method, method_args = parseopts()
+    loglevel, method, method_args, method_kwargs = parseopts()
     logging.basicConfig(format='%(asctime)s %(levelname)s %(module)s: %(message)s', level=loglevel)  # use %(name)s instead of %(module) to include hierarchy information, see https://docs.python.org/2/library/logging.html
     logger = logging.getLogger(__name__)
     tlm = towalinkmanager.TLM()
     method = getattr(tlm, method)
-    exceptionlogger.call(method, *method_args, reraise_exceptions=True)
+    exceptionlogger.call(method, *method_args, **method_kwargs, reraise_exceptions=True)
 
 
 if __name__ == "__main__":
