@@ -25,7 +25,7 @@ protocol static static4 {
 protocol static static6 {
     check link; 
 
-{%- for peer, peerdata in bgp_peers.items() %}
+{%- for peer, peerdata in bgp_peers.items()|sort %}
     route {{peerdata.loopback_ipv6.partition('/')[0]}}/128 via "{{peerdata.ifname_local}}";
 {%- endfor %}
 
