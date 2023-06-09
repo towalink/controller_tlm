@@ -23,6 +23,7 @@ NAME_TEMPOUTPUT_DIRECTORY = 'tmp'
 NAME_OUTPUT_DIRECTORY = 'new'
 NODE_CONFIG_PATH = '/etc/towalink/configs'
 WG_INTERFACE = 'tlwg_mgmt'
+WG_LISTENPORT = 51820
 
 
 class ConfigOrchestrator():

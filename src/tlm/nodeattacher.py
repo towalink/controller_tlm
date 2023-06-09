@@ -263,7 +263,7 @@ class NodeAttacher(object):
 
     def configure_mgmt_interface(self, nodeconfig):
         """Configures the management interface for the newly attached node"""
-        mi = management_interface.MgmtInterface(configorchestrator.WG_INTERFACE)
+        mi = management_interface.MgmtInterface(configorchestrator.WG_INTERFACE, configorchestrator.WG_LISTENPORT)
         node_id = nodeconfig.get_item('node_id')
         wg_public = nodeconfig.get_item('attach_wg_public')
         wg_shared = nodeconfig.get_item('attach_wg_shared')

@@ -15,9 +15,10 @@ logger = logging.getLogger(__name__);
 class MgmtInterface(object):
     """Class for configuring and managing the WireGuard management interface"""
     
-    def __init__(self, wg_interface):
+    def __init__(self, wg_interface, wg_listenport=51820):
         """Object initialization"""
         self.wg_interface = wg_interface 
+        self.wg_listenport = wg_listenport 
         self._wg_public = None
         self.wgconfig = wgconfig.WGConfig(self.wg_interface)
         try:
@@ -39,7 +40,7 @@ class MgmtInterface(object):
     def ensure_configuration(self):
         """Makes sure that the WireGuard interface has a basic configuration"""        
         self.wgconfig.add_attr(None, 'PrivateKey', wgexec.generate_privatekey())
-        self.wgconfig.add_attr(None, 'ListenPort', 51820) # *** we need to get the listenport from config
+        self.wgconfig.add_attr(None, 'ListenPort', self.wg_listenport)
         self.wgconfig.add_attr(None, 'Address', 'fe80::1')
         self.wgconfig.write_file()
 
