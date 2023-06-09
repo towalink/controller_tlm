@@ -21,6 +21,13 @@ class Git():
         """Initializer"""
         self.confdir = confdir    
 
+    def check_git_executable(self):
+        """Check whether the git executable is present"""
+        if not os.path.exists('/usr/bin/git'):
+            logger.warn('No git executable found; cannot initialize version control')
+            return False
+        return True
+
     def ensure_gitignore(self):
         """Ensure that a .gitignore file is present in the config directory"""
         filename = os.path.join(self.confdir, '.gitignore')
@@ -42,6 +49,8 @@ class Git():
 
     def initialize_git(self):
         """Initialize git in the config directory"""
+        if not self.check_git_executable():
+            return False
         logger.info('Initializing git in config directory')
         if self.execute_git('init'):
             if self.execute_git('add', '.'):
@@ -60,6 +69,8 @@ class Git():
 
     def execute_git(self, *git_args, nowarnings=False):
         """Execute git command with the provided arguments"""
+        if not self.check_git_executable():
+            return False
         logger.debug(f'Executing [git -C {self.confdir} {" ".join(git_args)}]')
         args = ['git', '-C', self.confdir]
         args.extend(git_args)
