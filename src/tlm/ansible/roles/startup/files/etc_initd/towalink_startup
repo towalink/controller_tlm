@@ -3,6 +3,7 @@
 depend() {
     need net
     after towalink_bootstrap
+    after sshd
     before bird
 }
 
