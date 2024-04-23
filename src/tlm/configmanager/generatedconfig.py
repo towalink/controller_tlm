@@ -25,7 +25,7 @@ class GeneratedConfig(tomlconfighierarchy.TOMLConfigHierarchy):
         super().__init__(filename)
         if os.path.isfile(filename):
             self.load_config()
-        self.wireguard = wireguard.Wireguard()
+        self.wireguard = wireguard.WireGuard()
 
     def save_config(self):
         """Saves the current configuration to file"""
