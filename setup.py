@@ -7,14 +7,14 @@ with open('README.md', 'r') as f:
 
 setup_kwargs = {
     'name': 'towalink_tlm',
-    'version': '0.2.0',
+    'version': '0.3.1',
     'author': 'The Towalink Project',
     'author_email': 'pypi.tlm@towalink.net',
     'description': 'command line tool for configuring and managing a Towalink installation',
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
     'url': 'https://www.towalink.net',
-    'packages': setuptools.find_packages('src'),
+    'packages': setuptools.find_namespace_packages('src'),
     'package_dir': {'': 'src'},
     'include_package_data': True,
     'install_requires': ['python-configuration',
@@ -23,7 +23,7 @@ setup_kwargs = {
                          'toml',
                          'tomlkit',
                          'ansible',
-                         'wgconfig>=0.1.4'
+                         'wgconfig>=1.0.1'
                         ],
     'entry_points': '''
         [console_scripts]
