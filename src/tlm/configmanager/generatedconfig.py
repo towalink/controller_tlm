@@ -35,17 +35,17 @@ class GeneratedConfig(tomlconfighierarchy.TOMLConfigHierarchy):
         super().save_config()
 
     def generate_wireguard_keypair(self):
-        """Returns a Wireguard key pair"""
+        """Returns a WireGuard key pair"""
         wg_private, wg_public = self.wireguard.generate_keypair()
         if wg_public is None:
-            raise ValueError('Generating Wireguard key pair failed. Is Wireguard installed and in the search path?')
+            raise ValueError('Generating WireGuard key pair failed. Is WireGuard installed and in the search path?')
         return wg_private, wg_public
 
     def generate_wireguard_psk(self):
         """Returns a Wireguard pre-shared key"""
         wg_preshared = self.wireguard.generate_presharedkey()
         if wg_preshared is None:
-            raise ValueError('Generating Wireguard pre-shared key failed. Is Wireguard installed and in the search path?')
+            raise ValueError('Generating WireGuard pre-shared key failed. Is WireGuard installed and in the search path?')
         return wg_preshared
 
     def set_neighbors(self, neighbors):
@@ -53,7 +53,7 @@ class GeneratedConfig(tomlconfighierarchy.TOMLConfigHierarchy):
         for node_key, neighborlist in neighbors.items():
             self.set_item(f'neighbors.{node_key}', neighborlist)
 
-    def set_linkdata(self, node1_key, node2_key, active):
+    def set_linkdata(self, node1_key, node2_key, active, wg_mtu):
         """Ensures that all data of a link is present as needed"""
         if node1_key > node2_key: # make sure that the first identifier is the smaller one
             node2_key, node1_key = node1_key, node2_key
@@ -73,7 +73,9 @@ class GeneratedConfig(tomlconfighierarchy.TOMLConfigHierarchy):
             self.set_item(f'links.{linkname}.wg_preshared', wg_preshared)
         if active and (self.get_item(f'links.{linkname}.bgp_password') is None):
             bgp_password = ''.join(secrets.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(16))
-            self.set_item(f'links.{linkname}.bgp_password', bgp_password)            
+            self.set_item(f'links.{linkname}.bgp_password', bgp_password)
+        if active or (self.get_item(f'links.{linkname}.wg_mtu') is not None):  # set initially only when active but update existing value always
+            self.set_item(f'links.{linkname}.wg_mtu', wg_mtu)
 
 
 if __name__ == '__main__':

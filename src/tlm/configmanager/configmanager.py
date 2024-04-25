@@ -20,6 +20,7 @@ ATTR_NODE_ID = 'node_id'
 NODE_DIR_PREFIX = 'node_'
 SITE_DIR_PREFIX = 'site_'
 CONFNAME = 'config.toml' # name of the config file
+WG_MTU_DEFAULT = 1420
 
 
 class ConfigManager():
@@ -78,10 +79,15 @@ class ConfigManager():
             node1 = self.nodes[node1_key]
             node2 = self.nodes[node2_key]
             active = len(node1.groups.intersection(node2.groups)) > 0
+            node1_wgmtu = node1.complete_cfg.get('wg_mtu', WG_MTU_DEFAULT)
+            node2_wgmtu = node2.complete_cfg.get('wg_mtu', WG_MTU_DEFAULT)
+            wg_mtu = min(node1_wgmtu, node2_wgmtu)  # set link MTU to smallest common denominator of both Nodes
+            if wg_mtu == WG_MTU_DEFAULT:
+                wg_mtu = None
             if active:
                 neighbors[node1_key].append(node2_key)
                 neighbors[node2_key].append(node1_key)
-            self.generated.set_linkdata(node1_key, node2_key, active=active)
+            self.generated.set_linkdata(node1_key, node2_key, active=active, wg_mtu=wg_mtu)
         self.generated.set_neighbors(neighbors)
         self.generated.save_config()    
         

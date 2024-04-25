@@ -5,6 +5,9 @@ Address = {{wg_addresses|join(', ')}}
 {%- if wg_peer_address_ipv4 is defined %}
 Postup = ip addr add {{wg_address_ipv4}} peer {{wg_peer_address_ipv4}} dev {{wg_ifname}}
 {%- endif %}
+{%- if wg_mtu is defined %}
+Mtu = {{wg_mtu}}
+{%- endif %}
 Table = off
 
 [Peer]

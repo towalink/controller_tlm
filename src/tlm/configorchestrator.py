@@ -150,6 +150,8 @@ class ConfigOrchestrator():
                     wg_ifname = f'tlwg_{peer}'
                     cfg_effective.set_item(f'wg_links.{peer}.wg_ifname', wg_ifname)
                     cfg_effective.set_item(f'wg_links.{peer}.wg_listenport', wg_listenport_base + int(peer))
+                    if data.get('wg_mtu') is not None:
+                        cfg_effective.set_item(f'wg_links.{peer}.wg_mtu', data.get('wg_mtu'))
                     #Removed IPv4 addresses since it is added by other means (i.e. post-up directive)
                     #wg_addresses = [ self.get_ipaddress_byoffset(internode_transfernet_ipv4, offset=node_id, keep_prefixlen=True),
                     #                 self.get_ipaddress_byoffset(internode_transfernet_ipv6, offset=node_id, keep_prefixlen=True) ]
