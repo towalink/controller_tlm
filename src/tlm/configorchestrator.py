@@ -261,14 +261,15 @@ class ConfigOrchestrator():
     def mirror_node_configs(self, nodes):
         """Mirrors the config files of the given nodes to the respective devices"""
         for node_id in nodes:
-            node = self.cm.nodes.get(node_id)            
+            node = self.cm.nodes.get(node_id)
+            node_fullname = node.complete_cfg.get('node_fullname')
             mgmt_address = node.get('attach_mgmt_address')
             if mgmt_address is None:
                 logger.warning(f'Node [{node_id}] does not seem to have been attached; attach_mgmt_address is missing; skipping')
                 continue            
             logger.debug(f'Mirroring config files for node [{node_id}] with management address [{mgmt_address}]')
             fs = filesync.FileSync(sourcepath=self.get_node_dir(node_id), destpath=NODE_CONFIG_PATH)
-            fs.mirror_node_configs(mgmt_address)
+            fs.mirror_node_configs(node_fullname, mgmt_address)
 
     def activate_nodeconfigs(self, nodes, version='latest'):
         """Activates the requested config version on the given node devices"""
@@ -287,7 +288,8 @@ class ConfigOrchestrator():
             raise ValueError('Version is malformed')
         # Iterate through nodes
         for node_id in nodes:
-            node = self.cm.nodes.get(node_id)            
+            node = self.cm.nodes.get(node_id)   
+            node_fullname = node.complete_cfg.get('node_fullname')
             mgmt_address = node.get('attach_mgmt_address')
             if mgmt_address is None:
                 logger.warning(f'Node [{node_id}] does not seem to have been attached; attach_mgmt_address is missing; skipping')
@@ -311,7 +313,7 @@ class ConfigOrchestrator():
             # Mirroring changes to node
             logger.info(f'Activating config for node [{node_id}]')
             fs = filesync.FileSync(sourcepath=self.get_node_dir(node_id), destpath=NODE_CONFIG_PATH)
-            fs.mirror_node_active(mgmt_address)
+            fs.mirror_node_active(node_fullname, mgmt_address)
 
 
 if __name__ == '__main__':
