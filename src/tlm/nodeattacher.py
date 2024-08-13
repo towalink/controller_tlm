@@ -82,6 +82,7 @@ req_template = r'''
     tlwg_mgmt="
     [Interface]
     ListenPort = {{wg_listenport}}
+    Mtu = 1392
     PrivateKey = ${wg_private}
     #PublicKey = ${wg_public}
     Address = {{wg_addresses|join(', ')}}

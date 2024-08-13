@@ -41,6 +41,7 @@ class MgmtInterface(object):
         """Makes sure that the WireGuard interface has a basic configuration"""        
         self.wgconfig.add_attr(None, 'PrivateKey', wgexec.generate_privatekey())
         self.wgconfig.add_attr(None, 'ListenPort', self.wg_listenport)
+        self.wgconfig.add_attr(None, 'Mtu', '1392')
         self.wgconfig.add_attr(None, 'Address', 'fe80::1')
         self.wgconfig.write_file()
 
