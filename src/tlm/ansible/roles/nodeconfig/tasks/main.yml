@@ -20,6 +20,7 @@
     name:
       - rsync # needed for Ansible synchronize
       - python3-venv # added due to Sebastian's report on certain Debian version
+      - python3-packaging # required on newer Debian
     state: present
   tags: installation
   when: ansible_facts['os_family'] == 'Debian'
