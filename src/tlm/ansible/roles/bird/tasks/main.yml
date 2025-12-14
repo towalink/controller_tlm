@@ -45,12 +45,12 @@
   tags: installation
   when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'buster')
 
-- name: bird - Install required packages (apt, Bullseye)
+- name: bird - Install required packages (apt, Bullseye and newer)
   apt:
     name: bird2
     state: present
   tags: installation
-  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] == 'bullseye')
+  when: (ansible_facts['os_family'] == 'Debian') and (ansible_facts['distribution_release'] != 'buster')
 
 - name: bird - Make sure log file has correct permissions
   file:
